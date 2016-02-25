@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace JSharpWolf.PerformantCollections
 {
+    /// <summary>
+    /// Supports fast iterating of a fragmented list
+    /// </summary>
     public class FragmentedListEnumerator<T> : IEnumerator<T>
     {
         private List<T> _currentList;
