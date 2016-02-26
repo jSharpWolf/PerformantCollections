@@ -142,7 +142,7 @@ namespace JSharpWolf.PerformantCollections
             {
                 var l = RetrieveList(index);
                 if (l == null) throw new ArgumentOutOfRangeException(nameof(index));
-                var si = FragmentSize % index;
+                var si = index % FragmentSize;
                 l[si] = value;
             }
         }
