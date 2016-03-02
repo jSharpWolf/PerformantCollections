@@ -21,6 +21,10 @@ namespace JSharpWolf.PerformantCollections.DevUi
             var x = new ExtendableDictionary<int, int>();
             x.Add(5,7);
             x.Add(6,8);
+            x.Add(7,8);
+            x.Add(8,8);
+            x.Add(9,8);
+            x.Add(10,8);
         }
         static void FlBenchmark()
         {

@@ -11,19 +11,19 @@ namespace JSharpWolf.PerformantCollections
     public class ExtendableDictionary<TKey, TValue>
     {
         public IList<int> Buckets;
-        private IList<Entry> Entries;
+        public IList<Entry> Entries;
         public int Count { get; private set; }
         private int Capacity { get; set; }
         private IComparer<TKey> _comparer;
         private int _free;
         public ExtendableDictionary()
         {
-            Entries = new Entry[16];
-            Buckets= new int[16];
-            Capacity = 16;
+            Entries = new Entry[4];
+            Buckets= new int[4];
+            Capacity = 4;
             Count = 0;
             _free = 16;
-            for (var i = 0; i < 16; ++i)
+            for (var i = 0; i < 4; ++i)
                 Buckets[i] = -1;
         }
         
@@ -47,14 +47,35 @@ namespace JSharpWolf.PerformantCollections
                     Entries[i] = new Entry(Entries[i], value);
                 }
             }
-            // TODO: HANDLE RESIZE
             var insertIx = Count;
             Count++;
+            if (insertIx == Count)
+            {
+                ResizeArray(Count*2);
+            }
             var e = new Entry(n, bucketIx,key,value);
             Entries[insertIx] = e;
             Buckets[bucketIx] = insertIx;
         }
 
+        protected void ResizeArray(int size)
+        {
+            Buckets = new int[size];
+            for (var i = 0; i < size; ++i) Buckets[i] = -1;
+            var newEntries = new Entry[size];
+            var x = Entries as Entry[] as Array;
+            if (x==null) throw new Exception("Excpected a reziable array for the dictionary");
+            Array.Copy(x, newEntries, Count);
+            for (var i = 0; i < Count; ++i)
+            {
+                if (newEntries[i].HashCode >= 0)
+                {
+                    var nextIndex = newEntries[i].HashCode%size;
+                    newEntries[i].Next = Buckets[nextIndex];
+                }
+            }
+            Entries = newEntries;
+        }
         public struct Entry
         {
             public int HashCode;
