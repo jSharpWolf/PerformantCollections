@@ -12,8 +12,15 @@ namespace JSharpWolf.PerformantCollections.DevUi
         static Random _rnd = new Random();
         static void Main(string[] args)
         {
-            FlBenchmark();
+            ExtendableDictTest();
             Console.ReadLine();
+        }
+
+        static void ExtendableDictTest()
+        {
+            var x = new ExtendableDictionary<int, int>();
+            x.Add(5,7);
+            x.Add(6,8);
         }
         static void FlBenchmark()
         {

@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExtendableDictionary.cs" />
     <Compile Include="FragmentedList.cs" />
     <Compile Include="FragmentedListEnumerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
