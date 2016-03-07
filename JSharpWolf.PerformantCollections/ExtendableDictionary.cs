@@ -49,31 +49,39 @@ namespace JSharpWolf.PerformantCollections
             }
             var insertIx = Count;
             Count++;
-            if (insertIx == Count)
+            if (Count == Capacity)
             {
                 ResizeArray(Count*2);
+                Buckets[n % Capacity] = Count;
             }
-            var e = new Entry(n, bucketIx,key,value);
+            else
+            {
+                Buckets[bucketIx] = insertIx;
+            }
+            var e = new Entry(n, n%Buckets.Count,key,value);
             Entries[insertIx] = e;
-            Buckets[bucketIx] = insertIx;
+
         }
 
         protected void ResizeArray(int size)
         {
+            Capacity = size;
             Buckets = new int[size];
             for (var i = 0; i < size; ++i) Buckets[i] = -1;
             var newEntries = new Entry[size];
             var x = Entries as Entry[] as Array;
             if (x==null) throw new Exception("Excpected a reziable array for the dictionary");
-            Array.Copy(x, newEntries, Count);
+            Array.Copy(x, newEntries, Count-1);
             for (var i = 0; i < Count; ++i)
             {
-                if (newEntries[i].HashCode >= 0)
+                if (newEntries[i].HashCode >=0 )
                 {
                     var nextIndex = newEntries[i].HashCode%size;
                     newEntries[i].Next = Buckets[nextIndex];
+                    Buckets[newEntries[i].HashCode % size] = i;
                 }
             }
+
             Entries = newEntries;
         }
         public struct Entry

@@ -19,12 +19,12 @@ namespace JSharpWolf.PerformantCollections.DevUi
         static void ExtendableDictTest()
         {
             var x = new ExtendableDictionary<int, int>();
-            x.Add(5,7);
-            x.Add(6,8);
-            x.Add(7,8);
-            x.Add(8,8);
-            x.Add(9,8);
-            x.Add(10,8);
+            x.Add(0,7);
+            x.Add(1,8);
+            x.Add(2,8);
+            x.Add(3,8);
+            x.Add(4,8);
+            x.Add(5,8);
         }
         static void FlBenchmark()
         {
