@@ -15,7 +15,8 @@ namespace JSharpWolf.PerformantCollections
         public TKey Key;
         public TValue Value;
         public bool Nil;
-
+        public volatile bool Marked;
+        public volatile bool Linked;
         public SkipListNode()
         {
             
@@ -116,12 +117,12 @@ namespace JSharpWolf.PerformantCollections
         }
         public void AddNode(TKey key, TValue value)
         {
+            var insertLevel = GetRandomLevel();
             var ntu = GetNodesToUpdate(key);
             var n = ntu[0];
             if (n != null && !n.Nil && _comparer.Compare(ntu[0].Value, value) ==0)
                 throw new ArgumentException("Cannot add duplicate values to the SkipList", "key");
             //var uhArr = new SkipListNode<TKey, TValue>[_height];
-            var insertLevel = GetRandomLevel();
             var nodeToAdd = new SkipListNode<TKey, TValue>(key, value, insertLevel + 1);
 
             if (insertLevel > _height)
