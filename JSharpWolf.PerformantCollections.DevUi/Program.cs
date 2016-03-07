@@ -20,11 +20,10 @@ namespace JSharpWolf.PerformantCollections.DevUi
         {
             var x = new SkipList<int, int>();
             var cd = new Dictionary<int,int>();
-            for (var i = 0; i < 1000; ++i)
+            for (var i = 0; i < 100000; ++i)
             {
-                x.AddNode(i, i+10);
-                cd.Add(i, i+10);
-                Debug.Assert(x.Find(i) == cd[i]);
+               x.AddNode(i,i+1);
+                cd.Add(i, i+1);
             }
         }
         static void FlBenchmark()

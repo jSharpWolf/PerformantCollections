@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -13,10 +14,17 @@ namespace JSharpWolf.PerformantCollections
         public SkipListNode<TKey, TValue>[] Next;
         public TKey Key;
         public TValue Value;
+        public bool Nil;
 
         public SkipListNode()
         {
             
+        }
+
+        public SkipListNode(int height)
+        {
+            Next = new SkipListNode<TKey, TValue>[height];
+            Nil = true;
         }
         public SkipListNode(TKey key, TValue value, int height)
         {
@@ -68,7 +76,7 @@ namespace JSharpWolf.PerformantCollections
         private int GetRandomLevel()
         {
             var h = 0;
-            while (_rnd.NextDouble() <= _prob && h < _height+1  && h<_maxLevel)
+            while (_rnd.NextDouble() <= _prob && h < _height+1 )
             {
                 h++;
             }
@@ -87,6 +95,19 @@ namespace JSharpWolf.PerformantCollections
             return current;
         }
 
+        private SkipListNode<TKey, TValue>[] GetNodesToUpdate(TKey key)
+        {
+            var nodes = new SkipListNode<TKey, TValue>[_height];
+            var current = _head;
+            for (var i = _height - 1; i >= 0; --i)
+            {
+                while (current.Next[i] != null && _comparer.Compare(current.Next[i].Key, key) < 0) current = current.Next[i];
+                nodes[i] = current;
+            }
+            return nodes;
+        }
+    
+
         public TValue Find(TKey key)
         {
             int lvl;
@@ -95,50 +116,30 @@ namespace JSharpWolf.PerformantCollections
         }
         public void AddNode(TKey key, TValue value)
         {
-            int adjLevel;
-            var adjacent = FindAdjacent(key, out adjLevel);
-            if (adjacent.Next[adjLevel] != null && _comparer.Compare(adjacent.Next[adjLevel].Key, key) ==0)
+            var ntu = GetNodesToUpdate(key);
+            var n = ntu[0];
+            if (n != null && !n.Nil && _comparer.Compare(ntu[0].Value, value) ==0)
                 throw new ArgumentException("Cannot add duplicate values to the SkipList", "key");
             //var uhArr = new SkipListNode<TKey, TValue>[_height];
             var insertLevel = GetRandomLevel();
             var nodeToAdd = new SkipListNode<TKey, TValue>(key, value, insertLevel + 1);
+
             if (insertLevel > _height)
             {
                 _head.IncreaseHeight(1);
+                _head.Next[_height] = nodeToAdd;
                 _height++;
             }
-            for (var i = 0; i < adjacent.Height &&  i < nodeToAdd.Height; ++i)
+            for (var i = 0; i < nodeToAdd.Height; ++i)
             {
-                nodeToAdd.Next[i] = adjacent.Next[i];
-            }
-            adjacent.Next[adjLevel] = nodeToAdd;
-        }
-
-        public void AddNode2(TKey key, TValue value)
-        {
-            var current= _head;
-            var uhArr = new SkipListNode<TKey, TValue>[_height];
-            var insertLevel = GetRandomLevel();
-            var nodeToAdd = new SkipListNode<TKey, TValue>(key, value, insertLevel+1);
-            for (var i = _height - 1; i >= 0; --i)
-            {
-                while (current.Next[i] != null && _comparer.Compare(current.Next[i], key) < 0)
-                    current = current.Next[i];
-                uhArr[i] = current;
-            }
-
-            for (var i = 0; i < _height; ++i)
-            {
-                nodeToAdd.Next[i] = uhArr[i].Next[i];
-                uhArr[i].Next[i] = nodeToAdd;
-            }
-            if (insertLevel > _height)
-            {
-                _head.IncreaseHeight(1);
-                _head.Next[_height - 1] = nodeToAdd;
-                _height++;
+                if (i < ntu.Length)
+                {
+                    nodeToAdd.Next[i] = ntu[i].Next[i];
+                    ntu[i].Next[i] = nodeToAdd;
+                }
             }
         }
+
 
     }
 }
