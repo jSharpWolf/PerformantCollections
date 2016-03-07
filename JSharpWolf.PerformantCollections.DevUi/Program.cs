@@ -18,13 +18,14 @@ namespace JSharpWolf.PerformantCollections.DevUi
 
         static void ExtendableDictTest()
         {
-            var x = new ExtendableDictionary<int, int>();
-            x.Add(0,7);
-            x.Add(1,8);
-            x.Add(2,8);
-            x.Add(3,8);
-            x.Add(4,8);
-            x.Add(5,8);
+            var x = new SkipList<int, int>();
+            var cd = new Dictionary<int,int>();
+            for (var i = 0; i < 1000; ++i)
+            {
+                x.AddNode(i, i+10);
+                cd.Add(i, i+10);
+                Debug.Assert(x.Find(i) == cd[i]);
+            }
         }
         static void FlBenchmark()
         {
