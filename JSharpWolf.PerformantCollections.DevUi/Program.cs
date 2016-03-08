@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,12 +21,25 @@ namespace JSharpWolf.PerformantCollections.DevUi
         static void ExtendableDictTest()
         {
             var x = new SkipList<int, int>();
-            var cd = new Dictionary<int,int>();
-            for (var i = 0; i < 100000; ++i)
+            var cd = new SortedDictionary<int,int>();
+            var rnd = new Random();
+            var hs = new HashSet<int>();
+            while (hs.Count < 1000000)
             {
-               x.AddNode(i,i+1);
-                cd.Add(i, i+1);
+                var num = rnd.Next(1, 50000000);
+                if (hs.Contains(num)) continue;
+                hs.Add(num);
             }
+            //foreach (var i in hs)
+            //{ 
+            //    x.TryAdd(i, i + 1);
+            //}
+
+            Parallel.ForEach(hs, (i) =>
+            {
+                var z = x.TryAdd(i, i + 1);
+                Debug.Assert(z);
+            });
         }
         static void FlBenchmark()
         {
